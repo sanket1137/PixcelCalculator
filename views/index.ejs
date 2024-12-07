@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Screen Cost Calculator</title>
+    <link rel="stylesheet" href="/style.css">
+    <script>
+        const outdoorCosts = {
+            P6: { panelCost: 730, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 4500 },
+            P5: { panelCost: 1080, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 4466 },
+            P4: { panelCost: 1230, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 5500 },
+            P4_PRO: { panelCost: 1350, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 5222 },
+            P3_076_PRO: { panelCost: 2240, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 7714 }
+        };
+
+        const indoorCosts = {
+            P2_5: { panelCost: 1320, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 7000 },
+            P3: { panelCost: 952, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 4107.6 },
+            P4: { panelCost: 1230, rsaCardCost: 130, controllerCost: 100, powerSupplyCost: 150, miscellaneousCost: 300, panelFrameCost: 350, marketRate: 4886 }
+        };
+
+        function updateConfigFields() {
+            const screenType = document.getElementById('screenType').value;
+            const screenSize = document.getElementById('screenSize').value;
+            let config;
+
+            if (outdoorCosts[screenType]) {
+                config = outdoorCosts[screenType];
+            } else {
+                config = indoorCosts[screenType];
+            }
+
+            document.getElementById('panelCost').value = config.panelCost;
+            document.getElementById('rsaCardCost').value = config.rsaCardCost;
+            document.getElementById('controllerCost').value = config.controllerCost;
+            document.getElementById('powerSupplyCost').value = config.powerSupplyCost;
+            document.getElementById('miscellaneousCost').value = config.miscellaneousCost;
+            document.getElementById('panelFrameCost').value = config.panelFrameCost;
+            document.getElementById('marketRate').innerText = `Market Rate: Rs. ${config.marketRate}`;
+            document.getElementById('totalMarketRate').innerText = `Total Market Rate: Rs. ${config.marketRate * screenSize}`;
+        }
+
+        function toggleConfigFields() {
+            const configFields = document.getElementById('configFields');
+            if (configFields.style.display === 'none' || configFields.style.display === '') {
+                configFields.style.display = 'block';
+            } else {
+                configFields.style.display = 'none';
+            }
+        }
+
+        function switchTab(tab) {
+            const adminView = document.getElementById('adminView');
+            const userView = document.getElementById('userView');
+            if (tab === 'admin') {
+                adminView.style.display = 'block';
+                userView.style.display = 'none';
+            } else {
+                adminView.style.display = 'none';
+                userView.style.display = 'block';
+            }
+        }
+
+        function updateQuotedPrice() {
+            const marginInput = document.getElementById('marginInput');
+            const quotedPriceLabel = document.getElementById('quotedPriceLabel');
+            const totalCogs = parseFloat(document.getElementById('totalCogs').value);
+            const screenSize = parseFloat(document.getElementById('screenSize').value);
+            const margin = parseFloat(marginInput.value);
+            const quotedPrice = totalCogs * (1 + margin / 100);
+            const quotedPricePerSqft = quotedPrice / screenSize;
+            quotedPriceLabel.innerText = `Quoted Price: Rs. ${quotedPrice.toFixed(2)} (Rs. ${quotedPricePerSqft.toFixed(2)} per sqft)`;
+        }
+    </script>
+</head>
+<body onload="switchTab('user')">
+    <h1>LED Screen Cost Calculator</h1>
+    <div>
+        <button onclick="switchTab('user')">User</button>
+        <button onclick="switchTab('admin')">Admin</button>
+    </div>
+    <form action="/calculate" method="POST">
+        <label for="screenType">Select Screen Type:</label>
+        <select name="screenType" id="screenType" onchange="updateConfigFields()">
+            <optgroup label="Outdoor">
+                <option value="P6">P6</option>
+                <option value="P5">P5</option>
+                <option value="P4">P4</option>
+                <option value="P4_PRO">P4 PRO</option>
+                <option value="P3_076_PRO">P3.076 PRO</option>
+            </optgroup>
+            <optgroup label="Indoor">
+                <option value="P2_5">P2.5</option>
+                <option value="P3">P3</option>
+                <option value="P4">P4</option>
+            </optgroup>
+        </select>
+        <span id="marketRate"></span>
+        <span id="totalMarketRate"></span>
+        <br>
+        <label for="screenSize">Enter Screen Size (sqft):</label>
+        <input type="number" name="screenSize" id="screenSize" oninput="updateConfigFields()" required>
+        <br>
+        <label for="showConfig">Show Configuration Fields:</label>
+        <input type="checkbox" id="showConfig" onclick="toggleConfigFields()">
+        <br>
+        <div id="configFields" style="display: none;">
+            <label for="panelCost">Panel Cost (per module):</label>
+            <input type="number" name="panelCost" id="panelCost">
+            <br>
+            <label for="rsaCardCost">RSA Card Cost (per sqft):</label>
+            <input type="number" name="rsaCardCost" id="rsaCardCost">
+            <br>
+            <label for="controllerCost">Controller Cost (per sqft):</label>
+            <input type="number" name="controllerCost" id="controllerCost">
+            <br>
+            <label for="powerSupplyCost">Power Supply Cost (per sqft):</label>
+            <input type="number" name="powerSupplyCost" id="powerSupplyCost">
+            <br>
+            <label for="miscellaneousCost">Miscellaneous Cost (per sqft):</label>
+            <input type="number" name="miscellaneousCost" id="miscellaneousCost">
+            <br>
+            <label for="panelFrameCost">Panel Frame Cost (per sqft):</label>
+            <input type="number" name="panelFrameCost" id="panelFrameCost">
+            <br>
+        </div>
+        <button type="submit">Calculate</button>
+    </form>
+
+    <div id="userView">
+        <% if (typeof totalCogs !== 'undefined' && typeof minSellingPrice !== 'undefined' && typeof maxSellingPrice !== 'undefined') { %>
+            <h2>Results</h2>
+            <p>Screen Type: <%= screenType %></p>
+            <p>Screen Size: <%= screenSize %> sqft</p>
+            <p>Total COGS: Rs. <%= totalCogs %></p>
+            <p>Min Selling Price: Rs. <%= minSellingPrice %></p>
+            <p>Max Selling Price: Rs. <%= maxSellingPrice %></p>
+            <p>Market Rate: Rs. <%= marketRate %></p>
+            <p>Total Market Rate: Rs. <%= totalMarketRate %></p>
+        <% } %>
+    </div>
+
+    <div id="adminView" style="display: none;">
+        <% if (typeof totalCogs !== 'undefined' && typeof minSellingPrice !== 'undefined' && typeof maxSellingPrice !== 'undefined') { %>
+            <h2>Results</h2>
+            <p>Screen Type: <%= screenType %></p>
+            <p>Screen Size: <%= screenSize %> sqft</p>
+            <p>Total COGS: Rs. <%= totalCogs %> (Panel Cost + RSA Card Cost + Controller Cost + Power Supply Cost + Miscellaneous Cost + Panel Frame Cost)</p>
+            <p>Min Selling Price: Rs. <%= minSellingPrice %> (Total COGS * 1.3)</p>
+            <p>Max Selling Price: Rs. <%= maxSellingPrice %> (Total COGS * 1.5)</p>
+            <p>Market Rate: Rs. <%= marketRate %> /sqft</p>
+            <p>Total Market Rate: Rs. <%= totalMarketRate %> (Market Rate * Screen Size)</p>
+            <h3>Cost Breakdown</h3>
+            <p>Panel Cost: Rs. <%= totalCostBreakdown.totalPanelCost %> (Panel Cost * Number of Panels)</p>
+            <p>RSA Card Cost: Rs. <%= totalCostBreakdown.totalRsaCardCost %> (RSA Card Cost * Screen Size)</p>
+            <p>Controller Cost: Rs. <%= totalCostBreakdown.totalControllerCost %> (Controller Cost * Screen Size)</p>
+            <p>Power Supply Cost: Rs. <%= totalCostBreakdown.totalPowerSupplyCost %> (Power Supply Cost * Screen Size)</p>
+            <p>Miscellaneous Cost: Rs. <%= totalCostBreakdown.totalMiscellaneousCost %> (Miscellaneous Cost * Screen Size)</p>
+            <p>Panel Frame Cost: Rs. <%= totalCostBreakdown.totalPanelFrameCost %> (Panel Frame Cost * Screen Size)</p>
+            <h3>Additional Details</h3>
+            <p>Number of Panels Required: <%= numberOfPanels %> (Screen Size * 2)</p>
+            <h3>Admin Controls</h3>
+            <label for="marginInput">Margin (%):</label>
+            <input type="number" id="marginInput" name="marginInput" min="30" max="100" value="30" oninput="updateQuotedPrice()">
+            <span id="quotedPriceLabel">Quoted Price: Rs. <%= (totalCogs * 1.3).toFixed(2) %> (Rs. <%= ((totalCogs * 1.3) / screenSize).toFixed(2) %> per sqft)</span>
+            <input type="hidden" id="totalCogs" value="<%= totalCogs %>">
+            <input type="hidden" id="screenSize" value="<%= screenSize %>">
+        <% } %>
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input, select, button {
+    padding: 10px;
+    margin-top: 5px;
+    width: 100%;
+    max-width: 300px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+h2, h3 {
+    margin-top: 20px;
+    color: #333;
+}
+
+p {
+    margin: 5px 0;
+}
+
+#marketRate, #totalMarketRate {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+#adminView, #userView {
+    margin-top: 20px;
+}
